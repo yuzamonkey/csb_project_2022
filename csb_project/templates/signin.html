@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSB Messaging - Sign in</title>
 </head>
+
 <body>
-    <h3>Sign in</h3>
+    <h1>Sign in</h1>
+    <p>If you've just created an account, the default password is "password"</p>
+    <p><b>{{message}}</b></p>
+    <form method="POST">
+        <input placeholder="Username" type="text" name="username" required>
+        <input placeholder="Password" type="password" name="password" required>
+        <button type="submit">Sign in</button>
+    </form>
 </body>
+
 </html>
