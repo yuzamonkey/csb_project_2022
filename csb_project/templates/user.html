@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSB Messaging</title>
+</head>
+
+<body>
+    <h1>A warm welcome, {{username}}</h1>
+
+    <input type="text" placeholder="Change your password">
+    <a href="/">Sign out</a>
+
+    <h3>Messages</h3>
+    <table>
+        <tr>
+            <th>Sender</th>
+            <th>Time</th>
+            <th>Content</th>
+        </tr>
+        {% for message in messages %}
+        <tr>
+            <td>{{message.sender.username}}</td>
+            <td>{{message.time}}</td>
+            <td>{{message.content}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form action='../send_message/' method="POST">
+        <label for="receivers">Select receiver</label>
+        <select name="receiver" id="receivers">
+            {% for user in users %}
+            <option value={{user.username}}>{{user.username}}</option>
+            {% endfor %}
+        </select>
+        <textarea placeholder="Write a message" name="content" required></textarea>
+        <input type="hidden" name="sender" value={{username}}>
+        <button type="submit">Send</button>
+    </form>
+</body>
+
+</html>

@@ -1,15 +1,13 @@
-from unicodedata import name
+from django.dispatch import receiver
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import User, Message
 from .utils import user_is_in_db
 
+
 def index(request):
-    users = User.objects.all()
-    print ("Users", users, len(users))
-    for u in users:
-        print("U", u.username)
     return render(request, 'index.html')
+
 
 def sign_in(request):
     if request.method == 'POST':
@@ -18,19 +16,51 @@ def sign_in(request):
         if user_is_in_db(username):
             user = User.objects.filter(username=username)[0]
             if user.password == password:
-                return HttpResponse('Authentication done')
+                return redirect(f"../user?username={username}&password={password}")
             else:
                 return render(request, 'signin.html', {'message': 'Wrong credentials'})
         else:
             return render(request, 'signin.html', {'message': 'Wrong credentials'})
     return render(request, 'signin.html')
 
+
 def sign_up(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        if user_is_in_db(username): 
+        if user_is_in_db(username):
             return render(request, 'signup.html', {'message': f'Username "{username}" is taken'})
         new_user = User(username=username, password='password')
         new_user.save()
         return redirect(sign_in)
     return render(request, 'signup.html')
+
+
+def user_view(request):
+    username = request.GET.get('username')
+    password = request.GET.get('password')
+
+    if not user_is_in_db(username):
+        return HttpResponse('Invalid username')
+    user = User.objects.filter(username=username)[0]
+    if user.password != password:
+        return HttpResponse('Invalid password')
+
+    messages = Message.objects.filter(receiver=user)
+    users = User.objects.exclude(username=username)
+    params = {
+        'username': username,
+        'messages': messages,
+        'users': users
+    }
+    return render(request, 'user.html', params)
+
+def send_message(request):
+    sender = User.objects.filter(username=request.POST.get('sender'))[0]
+    receiver = User.objects.filter(username=request.POST.get('receiver'))[0]
+    content = request.POST.get('content')
+    print(f"{sender.username}->{receiver.username}: {content}")
+
+    new_message = Message(sender=sender, receiver=receiver, content=content)
+    new_message.save()
+
+    return redirect(f"../user?username={sender.username}&password={sender.password}")
