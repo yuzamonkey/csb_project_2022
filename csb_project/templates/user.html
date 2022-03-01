@@ -10,8 +10,12 @@
 
 <body>
     <h1>A warm welcome, {{username}}</h1>
+    <form action="../update_password/" method="POST">
+        <input type="password" name="password" placeholder="Update your password" minlength="3">
+        <input type="hidden" name="username" value={{username}}>
+        <button type="submit">Update</button>
+    </form>
 
-    <input type="text" placeholder="Change your password">
     <a href="/">Sign out</a>
 
     <h3>Messages</h3>
@@ -30,7 +34,7 @@
         {% endfor %}
     </table>
 
-    <form action='../send_message/' method="POST">
+    <form action="../send_message/" method="POST">
         <label for="receivers">Select receiver</label>
         <select name="receiver" id="receivers">
             {% for user in users %}

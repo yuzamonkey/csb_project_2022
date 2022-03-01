@@ -54,13 +54,19 @@ def user_view(request):
     }
     return render(request, 'user.html', params)
 
+
 def send_message(request):
     sender = User.objects.filter(username=request.POST.get('sender'))[0]
     receiver = User.objects.filter(username=request.POST.get('receiver'))[0]
     content = request.POST.get('content')
-    print(f"{sender.username}->{receiver.username}: {content}")
-
     new_message = Message(sender=sender, receiver=receiver, content=content)
     new_message.save()
-
     return redirect(f"../user?username={sender.username}&password={sender.password}")
+
+
+def update_password(request):
+    user = User.objects.filter(username=request.POST.get('username'))[0]
+    new_password = request.POST.get('password')
+    user.password = new_password
+    user.save()
+    return redirect(f"../user?username={user.username}&password={new_password}")
