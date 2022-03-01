@@ -1,4 +1,3 @@
-from django.dispatch import receiver
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import User, Message
@@ -70,3 +69,9 @@ def update_password(request):
     user.password = new_password
     user.save()
     return redirect(f"../user?username={user.username}&password={new_password}")
+
+
+def delete_db(request):
+    Message.objects.all().delete()
+    User.objects.all().delete()
+    return redirect(index)
