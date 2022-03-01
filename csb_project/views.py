@@ -3,13 +3,10 @@ from django.shortcuts import render, redirect
 from django.template import loader
 
 def index(request):
-    #return render(request, 'pages/index.html')
-    return HttpResponse('Welcome')
+    return render(request, 'index.html')
 
 def sign_in(request):
-    #return render(request, 'pages/index.html')
-    return HttpResponse('Sign in')
+    return render(request, 'signin.html')
 
 def sign_up(request):
-    #return render(request, 'pages/index.html')
-    return HttpResponse('Sign up')
+    return render(request, 'signup.html')
