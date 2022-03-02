@@ -77,6 +77,22 @@ def update_password(request):
     return redirect(f"../user/?username={user.username}&password={new_password}")
 
 
+def find_messages(request):
+    if request.method == 'POST':
+        mes_input = request.POST.get('message_input')
+        username = request.POST.get('username')
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT id FROM csb_project_user WHERE username='{username}'")
+        user_id = cursor.fetchall()[0][0]
+        cursor.execute("SELECT sender_id, content FROM csb_project_message WHERE content LIKE '%%%s%%' AND sender_id='%s' OR receiver_id='%s'" % (mes_input, user_id, user_id))
+        messages = cursor.fetchall()
+
+        params = {
+            'user_id': user_id,
+            'messages': messages,
+        }
+        return render(request, 'find_messages.html', params)
+
 def delete_db(request):
     Message.objects.all().delete()
     User.objects.all().delete()

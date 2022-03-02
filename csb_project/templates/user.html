@@ -18,7 +18,14 @@
 
     <a href="/">Sign out</a>
 
-    <h3>Messages</h3>
+    <h2>Messages</h2>
+    
+    <form action="../find_messages/" method="POST">
+        <input type="text" name="message_input" placeholder="Find message by content">
+        <input type="hidden" name="username" value={{username}}>
+        <button type="submit">Search</button>
+    </form>
+
     <table>
         <tr>
             <th>Sender</th>
@@ -46,6 +53,8 @@
         <input type="hidden" name="sender" value={{username}}>
         <button type="submit">Send</button>
     </form>
+
+
 </body>
 
 </html>
