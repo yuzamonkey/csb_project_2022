@@ -29,11 +29,12 @@
         <tr>
             <td>{{message.sender.username}}</td>
             <td>{{message.time}}</td>
-            <td>{{message.content}}</td>
+            <td>{{message.content|safe}}</td> 
+            <!-- XSS vulnerability! with |safe -->
         </tr>
         {% endfor %}
     </table>
-
+    
     <form action="../send_message/" method="POST">
         <label for="receivers">Select receiver</label>
         <select name="receiver" id="receivers">
