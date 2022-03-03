@@ -45,10 +45,11 @@ The given query could be sanitized by removing certain characters or not executi
 FLAW 4: Cross-site Scripting
 
 https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/templates/user.html#L39
+https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/views.py#L62
 
 The user.html-file has an XSS vulnerability. The message content can include script-tags to run any javascript code when the user logs in. The javascript-code itself is not seen in the page, so the user has no idea what the code includes (unless they look the in the browsers devtools). The messages cannot be deleted in this application, so the javascript code is run every time the users page is loaded.
 
-Preventing XSS in this case is straightforward; to not use the safe template filter. Django automatically prevents XSS, and the safe template filter marks a string to be "safe". In this app, where any user can write any message to any other user, it is not safe to assume that the messages are safe.
+Sanitizing the content of the message is a good idea, but preventing XSS in django is straightforward; to not use the safe template filter. Django automatically prevents XSS, and the safe template filter marks a string to be "safe". In this app, where any user can write any message to any other user, it is not safe to assume that the messages are safe.
 
 
 FLAW 5: Cross-site Request Forgery
