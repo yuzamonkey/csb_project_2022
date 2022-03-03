@@ -1,12 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.db import connection
 from .models import User, Message
 from .utils import user_is_in_db
-from django.db import connection
-
-# cursor = connection.cursor()
-# cursor.execute("SELECT * FROM csb_project_message")
-# messages = cursor.fetchall()
 
 
 def index(request):
@@ -82,9 +78,11 @@ def find_messages(request):
         mes_input = request.POST.get('message_input')
         username = request.POST.get('username')
         cursor = connection.cursor()
-        cursor.execute(f"SELECT id FROM csb_project_user WHERE username='{username}'")
+        cursor.execute(
+            f"SELECT id FROM csb_project_user WHERE username='{username}'")
         user_id = cursor.fetchall()[0][0]
-        cursor.execute("SELECT sender_id, content FROM csb_project_message WHERE content LIKE '%%%s%%' AND sender_id='%s' OR receiver_id='%s'" % (mes_input, user_id, user_id))
+        cursor.execute("SELECT sender_id, content FROM csb_project_message WHERE content LIKE '%%%s%%' AND sender_id='%s' OR receiver_id='%s'" % (
+            mes_input, user_id, user_id))
         messages = cursor.fetchall()
 
         params = {
@@ -92,6 +90,7 @@ def find_messages(request):
             'messages': messages,
         }
         return render(request, 'find_messages.html', params)
+
 
 def delete_db(request):
     Message.objects.all().delete()
