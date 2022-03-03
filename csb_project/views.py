@@ -91,8 +91,8 @@ def find_messages(request):
         }
         return render(request, 'find_messages.html', params)
 
-
-def delete_db(request):
-    Message.objects.all().delete()
-    User.objects.all().delete()
-    return redirect(index)
+# FOR DEVELOPMENT USE
+# def delete_db(request):
+#     Message.objects.all().delete()
+#     User.objects.all().delete()
+#     return redirect(index)

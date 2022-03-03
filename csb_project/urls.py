@@ -26,6 +26,5 @@ urlpatterns = [
     path('send_message/', views.send_message, name='send_message'),
     path('update_password/', views.update_password, name='update_password'),
     path('find_messages/', views.find_messages, name='find_messages'),
-    path('delete_db/', views.delete_db, name='delete_db'),
-    #path('admin/', admin.site.urls),
+    #for development path('delete_db/', views.delete_db, name='delete_db'),
 ]
