@@ -13,11 +13,11 @@ https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/views.py#L5
 https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/views.py#L68
 https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/settings.py#L26
 
-According to OWASP, the broken access control is present when URL can be modified and APIs can be accessed with the POST method. In this app, URL can be easily changed with query parameters and without logging in, to get to a users personal view. The address to users view is `/user/?username=<username>&password=<password>`. If the username cannot be found, 'Invalid username' will be shown. If the username is found in the db but the password is wrong, 'Invalid password' will be shown. This makes it very easy to brute force credentials and access users view.
+According to OWASP, the access control is broken when the url can be modified to access unauthorized data and APIs can be accessed with the POST method. In this app, the url can be easily changed with query parameters and without logging in, to get to a users personal view. The address to users view is `/user/?username=<username>&password=<password>`. If the username cannot be found, 'Invalid username' will be shown. If the username is found in the db but the password is wrong, 'Invalid password' will be shown. This makes it very easy to brute force credentials and access users view.
 
 Sending messages is easy when using an API platform (such as Postman). Sending a message only requires the sender, receiver and content fields, which can be sent with the POST parameters. In addition, the django settings has DEBUG set to True, so if an error occurs (even in production), the djangos default error page will be shown, which will pinpoint the exact code which caused the error. 
 
-To fix this issue, the whole architecture of the app should be changed. The users information should be stored in a session and tokens should be given to the user to access their data and post new data to the database. The username is public, so it's okay to have it in the address bar, but the password should not be seen anywhere, nor should the password be typed in the url to access data. By using the session cookies, it's easy to verify if a message can be sent by the authenticated user. In the app, there is no validation for the user when they are sending a message, so messages can be sent by anyone under other users username. In addition, the error messages should not be as informative as they are now; 'Invalid password' gives an attacker the information that they have a valid username.
+To fix this issue, the whole architecture of the app should be changed. The users information should be stored in a session and tokens should be given to the user to access their data and post new data to the database. The username is public, so it's not a big crime to have it in the address bar, but the password should not be seen anywhere, nor should the password be typed in the url to access data. By using the session cookies, it's easy to verify if a message can be sent by the authenticated user. In the app, there is no validation for the user when they are sending a message, so messages can be sent by anyone under other users username. In addition, the error messages should not be as informative as they are now; 'Invalid password' gives an attacker the information that they have a valid username.
 
 
 FLAW 2: Security Misconfiguration
@@ -26,11 +26,11 @@ https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/views.py#L3
 https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/templates/signin.html#L13
 https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/settings.py#L26
 
-According to OWASP, security is misconfigured when default accounts and their passwords are still enabled and unchanged, and error handling reveals stack traces or other overly informative error messages to users. The latter was already described in FLAW 1 (djangos default error page), but is a security misconfiguration, as well as broken access. 
+According to OWASP, security is misconfigured when default accounts and their passwords are still enabled and unchanged, and error handling reveals stack traces or other overly informative error messages to users. The latter was already described in FLAW 1 (djangos default error page), but it is a security misconfiguration, as well as broken access. 
 
-In this application, signing up is done by only entering a username. The usernames in the database must be disctinct, and an error is shown to the user if they are trying to enter an already existing username. If the username is not taken, the user will be redirect to sign in, where the page shows that the default password is 'password'. The user is not required to change the password. Also, passwords can be changed with a POST request when only knowing the username. So again, using Postman, it is easy to send a post request with the username and new passwords fields to change any users password. 
+In this application, signing up is done by only entering a username. The usernames in the database must be disctinct, and an error is shown to the user if they are trying to enter an already existing username. If the username is not taken, the user will be redirected to sign in. The signin page shows that the default password is 'password'. The user is not required to change the password. Also, passwords can be changed with a POST request when only knowing the username. So again, using Postman, it is easy to send a POST request with the username and password fields to change any users password. 
 
-The user should select their own password when creating an account and the password should be validated to meet some requirements. When changing a password, the current password should be given before sending the new password to the server. In the server the user should be authenticated and the passwords have to checked, to not let anyone change any users password. Also, it's not secure to have the default password hardcoded in the code or the signin.html-file. 
+The user should select their own password when creating an account and the password should be validated to meet some requirements. When changing a password, the current password should be given before sending the new password to the server. In the server the user should be authenticated and the passwords should be checked to not let anyone change any users password. Also, it's not secure to have the default password hardcoded in the code or the signin.html-file. 
 
 
 FLAW 3:	SQL Injection
@@ -39,7 +39,7 @@ https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/views.py#L8
 
 The app has a feature to search from the messages a user has sent or received. The feature is not anything special, but getting every users username and password is easy with an SQL injection. An example of a query parameter is "somerandomtext' UNION SELECT username, password FROM csb_project_user --", which will show every users data. Also, to address more security issues, the passwords are not hashed or salted.
 
-The given query could be sanitized, but like most of the code, using djangos model objects to find data is wiser. This would prevent direct access to the database by the user. Also, since the passwords are not hashed or salted, the attacker has an easy job to get every users actual password.
+The given query could be sanitized by removing certain characters or not executing the query at all if it contains unwanted characters. I consider it to be wiser to use djangos model objects to find data, which would prevent direct access to the database by the user. Also, since the passwords are raw in the database, an attacker has an easy job to get every users actual password rather than a bunch of hashes.
 
 
 FLAW 4: Cross-site Scripting
@@ -48,7 +48,7 @@ https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/templates/u
 
 The user.html-file has an XSS vulnerability. The message content can include script-tags to run any javascript code when the user logs in. The javascript-code itself is not seen in the page, so the user has no idea what the code includes (unless they look the in the browsers devtools). The messages cannot be deleted in this application, so the javascript code is run every time the users page is loaded.
 
-Preventing XSS in this case is straightforward; to not use the |safe template filter.
+Preventing XSS in this case is straightforward; to not use the safe template filter. Django automatically prevents XSS, and the safe template filter marks a string to be "safe". In this app, where any user can write any message to any other user, it is not safe to assume that the messages are safe.
 
 
 FLAW 5: Cross-site Request Forgery
@@ -57,4 +57,4 @@ https://github.com/yuzamonkey/csb_project_2022/blob/main/csb_project/settings.py
 
 Only the necessary middleware settings django provides are set in the settings.py-file. One of the middlewares commented out is the csrf-middleware. Normally django would not run the app unless html-files have the csrf-token in the POST-requests.
 
-Djangos @csrf_protect is very easy to add to prevent request forgery from occurring. The csrf-token is not hard to program for the session, since it needs to be passed to the html and sent back with the POST-requests. Though using djangos feature is easy to implement and makes the code generally cleaner.
+Djangos @csrf_protect is very easy to add to the views.py file to prevent request forgery from occurring, and adding the csrf token to forms that send POST requests in the html-files is a simple task. The csrf-token is not hard to program for the session, since it needs to be passed to the html and sent back with the POST-requests. Though using djangos feature is easy to implement and makes the code generally cleaner.
